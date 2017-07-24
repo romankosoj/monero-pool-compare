@@ -1,0 +1,120 @@
+<style>
+    hr{
+        border-top-color: #d9d9d9 !important;
+        margin-top: 40px !important;
+        margin-bottom: 40px !important;
+    }
+    #miningPorts > .stats{
+        width: auto !important;
+        margin-right: 70px;
+        margin-left: 15px;
+        display: inline-block;
+    }
+    #miningPorts > .stats:last-child{
+        margin-right: 0;
+    }
+    .getting_started_windows{
+        line-height: 40px;
+    }
+    #getting_started_list > li{
+        margin-bottom: 20px;
+    }
+    #mining_apps > tr:first-child > td{
+        padding-top: 35px;
+    }
+    #mining_apps > tr > td{
+        border-top: none;
+    }
+    #mining_apps > tr:nth-child(even) > td{
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 20px;
+    }
+    #mining_apps > tr:nth-child(odd) > td{
+        padding-top: 20px;
+    }
+    #mining_apps{
+        margin-top: 10px;
+    }
+    .miningAppTitle{
+        font-weight: bold;
+    }
+    .exampleAddress{
+        font-style: italic;
+    }
+    #cpuminer_code{
+        display: inline-block;
+        white-space: normal;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Getting Started</h2>
+        <p>This quick guide will get you up and mining in about 10 minutes- all you need is time and patience.</p>
+        <hr>
+        <div class="stats">
+            <div><i class="fa fa-cloud"></i> Mining Pool Address: <span>teracycle.net</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="stats">
+            <div><i class="fa fa-tachometer"></i> Port: <span>3333</span></div>
+            <div><i class="fa fa-unlock-alt"></i> Starting Difficulty: <span>100</span></div>
+            <div><i class="fa fa-question"></i> Description: <span>Low End Hardware</span></div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stats">
+            <div><i class="fa fa-tachometer"></i> Port: <span>5555</span></div>
+            <div><i class="fa fa-unlock-alt"></i> Starting Difficulty: <span>5000</span></div>
+            <div><i class="fa fa-question"></i> Description: <span>Mid-Level Hardware</span></div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stats">
+            <div><i class="fa fa-tachometer"></i> Port: <span>7777</span></div>
+            <div><i class="fa fa-unlock-alt"></i> Starting Difficulty: <span>10000</span></div>
+            <div><i class="fa fa-question"></i> Description: <span>High-End Hardware</span></div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-3 inverse"><strong>STEP 1. </strong><br>Creating A Wallet</div>
+    <div class="col-md-9"><p class="lead">There are two types of wallets you can use- hosted wallets and local wallets.</p>
+    <p>The best option is to use the default wallet software, and give it time to sync the entire blockchain to your computer. The plus side to this is that you'll be the only person holding the keys, and it is by far the most secure way to start a wallet. Hosted wallets don't have to stay in sync, but they also don't have the benefit of a single-keyholder being in charge of the wallets. A hosted wallet is significantly more likely to be stolen than a local wallet.</p>
+    <p>
+        <a href="https://getmonero.org/2017/03/29/monero-gui-beta-2-released.html" class="btn btn-default">Create Local Wallet</a>
+        <a href="https://mymonero.com/#/create-your-account" class="btn btn-default">Create Hosted Wallet</a>
+    </p>
+    </div>
+</div>
+<br><br>
+
+<div class="row">
+    <div class="col-md-3 inverse"><strong>STEP 2. </strong><br>Address & Password</div>
+    <div class="col-md-9"><p class="lead">Write down everything!</p>
+    <p>When creating your wallet, you'll be given a 25 word mnemonic seed. <strong>Write the seed down somewhere private!</strong></p>
+    <p>This seed can be used to re-generate your wallet if your computer gets blown up or tossed in a campfire or dropped in a tub with a screaming child. Keep your password and seed safe, and if you decide to encrypt your wallet, use a secure password like http://probablyagoodpassword.com</p>
+    </div>
+</div>
+<br><br>
+
+<div class="row">
+    <div class="col-md-3 inverse"><strong>STEP 3. </strong><br>CPU vs GPU Mining</div>
+    <div class="col-md-9"><p class="lead">There are several ways to mine</p>
+    <p>Monero can be mined with the CPU or GPU of most computers. The easiest way to mine is to download a miner that uses the CPU. CPU miners require less configuration and attention to detail, with a drawback of mining slower than GPU. Any mid-level gaming computer available today probably has adequate power to mine with the GPU, which is significantly faster, but harder to fine tune and keep cool.</p>
+    <p>
+        <a href="https://github.com/fireice-uk/xmr-stak-cpu/releases/tag/v1.2.0-1.4.1" class="btn btn-default">XMR-Stak CPU Miner [Intel/AMD]</a>*
+        <a href="https://github.com/fireice-uk/xmr-stak-nvidia" class="btn btn-default">XMR-Stak GPU Miner [Nvidia]</a>
+        <a href="https://bitcointalk.org/index.php?topic=638915.0" class="btn btn-default">Claymore GPU Miner [AMD]</a>
+    </p>
+    <p><small>This one will be flagged as malware by Windows Defender. Do not be alarmed.</small></p>
+    </div>
+</div>
+<br><br>

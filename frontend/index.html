@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+
+       <title>Teracycle Mining</title>
+
+    <script
+    src="https://code.jquery.com/jquery-2.1.4.min.js"
+    integrity="sha256-8WqyJLuWKRBVhxXIL1jBDD7SDxU936oZkCnxQbWwJVw="
+    crossorigin="anonymous"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    <script src="config.js"></script>
+    <script src="custom.js"></script>
+    <link href="custom.css" rel="stylesheet">
+
+</head>
+<body>
+
+<script>
+        $(document).ready(function () {
+          var trigger = $('.hamburger'),
+              overlay = $('.overlay')// Starts closed
+
+            trigger.click(function () {
+               isOpen = hamburger_cross(isOpen);
+            })
+
+            isOpen = hamburger_cross(isOpen); // Initial flip
+
+        });
+
+    var docCookies = {
+        getItem: function (sKey) {
+            return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+        },
+        setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+            if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
+            var sExpires = "";
+            if (vEnd) {
+                switch (vEnd.constructor) {
+                    case Number:
+                        sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
+                        break;
+                    case String:
+                        sExpires = "; expires=" + vEnd;
+                        break;
+                    case Date:
+                        sExpires = "; expires=" + vEnd.toUTCString();
+                        break;
+                }
+            }
+            document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+            return true;
+        },
+        removeItem: function (sKey, sPath, sDomain) {
+            if (!sKey || !this.hasItem(sKey)) { return false; }
+            document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + ( sDomain ? "; domain=" + sDomain : "") + ( sPath ? "; path=" + sPath : "");
+            return true;
+        },
+        hasItem: function (sKey) {
+            return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+        }
+    };
+
+    $.fn.update = function(txt){
+        var el = this[0];
+        if (el.textContent !== txt)
+            el.textContent = txt;
+        return this;
+    };
+
+    function updateTextClasses(className, text){
+        var els = document.getElementsByClassName(className);
+        for (var i = 0; i < els.length; i++){
+            var el = els[i];
+            if (el.textContent !== text)
+                el.textContent = text;
+        }
+    }
+
+    function updateText(elementId, text){
+        var el = document.getElementById(elementId);
+        if (el.textContent !== text){
+            el.textContent = text;
+        }
+        return el;
+    }
+
+
+    var currentPage;
+    var lastStats;
+
+    function getReadableCoins(coins, digits, withoutSymbol){
+        var amount = (parseInt(coins || 0) / coinUnits).toFixed(digits || coinUnits.toString().length - 1);
+        return amount + (withoutSymbol ? '' : (' ' + lastStats.config.symbol));
+    }
+
+    function formatDate(time){
+        if (!time) return '';
+        return new Date(parseInt(time) * 1000).toLocaleString();
+    }
+
+    function formatPaymentLink(hash){
+        return '<a target="_blank" href="' + transactionExplorer + hash + '">' + hash + '</a>';
+    }
+
+    function getPaymentRowElement(payment, jsonString){
+
+        var row = document.createElement('tr');
+        row.setAttribute('data-json', jsonString);
+        row.setAttribute('data-time', payment.time);
+        row.setAttribute('id', 'paymentRow' + payment.time);
+
+        row.innerHTML = getPaymentCells(payment);
+
+        return row;
+    }
+
+
+    function parsePayment(time, serializedPayment){
+        var parts = serializedPayment.split(':');
+        return {
+            time: parseInt(time),
+            hash: parts[0],
+            amount: parts[1],
+            fee: parts[2],
+            mixin: parts[3],
+            recipients: parts[4]
+        };
+    }
+
+    function renderPayments(paymentsResults){
+
+        var $paymentsRows = $('#payments_rows');
+
+        for (var i = 0; i < paymentsResults.length; i += 2){
+
+            var payment = parsePayment(paymentsResults[i + 1], paymentsResults[i]);
+
+            var paymentJson = JSON.stringify(payment);
+
+            var existingRow = document.getElementById('paymentRow' + payment.time);
+
+            if (existingRow && existingRow.getAttribute('data-json') !== paymentJson){
+                $(existingRow).replaceWith(getPaymentRowElement(payment, paymentJson));
+            }
+            else if (!existingRow){
+
+                var paymentElement = getPaymentRowElement(payment, paymentJson);
+
+                var inserted = false;
+                var rows = $paymentsRows.children().get();
+                for (var f = 0; f < rows.length; f++) {
+                    var pTime = parseInt(rows[f].getAttribute('data-time'));
+                    if (pTime < payment.time){
+                        inserted = true;
+                        $(rows[f]).before(paymentElement);
+                        break;
+                    }
+                }
+                if (!inserted)
+                    $paymentsRows.append(paymentElement);
+            }
+
+        }
+    }
+
+    window.onhashchange = function(){
+      routePage(function(){
+        isOpen = hamburger_cross(isOpen)
+      });
+    };
+
+
+    function fetchLiveStats() {
+        $.ajax({
+            url: api + '/live_stats',
+            dataType: 'json',
+            cache: 'false'
+        }).done(function(data){
+            lastStats = data;
+            updateIndex();
+            currentPage.update();
+        }).always(function () {
+            fetchLiveStats();
+        });
+    }
+
+
+    var xhrPageLoading;
+    function routePage(loadedCallback) {
+
+        if (currentPage) currentPage.destroy();
+        $('#page').html('');
+        $('#loading').show();
+
+        if (xhrPageLoading)
+            xhrPageLoading.abort();
+
+        $('.hot_link').parent().removeClass('active');
+        var $link = $('a.hot_link[href="' + (window.location.hash || '#') + '"]');
+
+        $link.parent().addClass('active');
+        var page = $link.data('page');
+
+        xhrPageLoading = $.ajax({
+            url: 'pages/' + page,
+            cache: false,
+            success: function (data) {
+                $('#loading').hide();
+                $('#page').show().html(data);
+                if (loadedCallback) loadedCallback();
+                currentPage.update();
+            }
+        });
+    }
+
+    function updateIndex(){
+        updateText('poolVersion', lastStats.config.version);
+    }
+
+    $(function(){
+        $.get(api + '/stats', function(data){
+            lastStats = data;
+            updateIndex();
+            routePage(fetchLiveStats);
+        });
+    });
+
+
+</script>
+
+<div id="wrapper">
+    <div class="overlay"></div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+            <ul class="nav sidebar-nav">
+                <li class="sidebar-brand">
+                    <img src="tc-small-logo-white.png" class="img-responsive" alt="Teracycle">
+                </li>
+                <li class="active"><a class="hot_link" data-page="home.html" href="#">
+                    <i class="fa fa-home"></i> Home
+                </a></li>
+
+                <li><a class="hot_link" data-page="getting_started.html" href="#getting_started">
+                    <i class="fa fa-rocket"></i> Getting Started
+                </a></li>
+
+                <li><a class="hot_link" data-page="pool_blocks.html" href="#pool_blocks">
+                    <i class="fa fa-cubes"></i> Pool Blocks
+                </a></li>
+
+                <li><a class="hot_link" data-page="payments.html" href="#payments">
+                    <i class="fa fa-paper-plane-o"></i> Payments
+                </a></li>
+                <li><a class="hot_link" data-page="market.html" href="#market">
+                    <i class="fa fa-btc"></i> Market <sup>new!</sup>
+                </a></li>
+
+            </ul>
+            <span id="poolVersion"></span>
+        </nav>
+<div id="page-content-wrapper">
+          <button type="button" class="hamburger animated fadeInLeft" data-toggle="offcanvas">
+            <span class="hamb-top"></span>
+            <span class="hamb-middle"></span>
+            <span class="hamb-bottom"></span>
+          </button>
+            <div class="container">
+            <div class="row">
+            <br>
+              <div class="col-sm-12">
+                <span class="hidden-xl hidden-lg hidden-md"><br><br></span>
+                <center>
+                  <img src="tc-small-logo-purp.png" style="height:4em;"class="img-responsive">
+                  </center>
+              </div>
+            </div>
+            <div class="row">
+            <br>
+                <div id="page"></div>
+
+                 <p id="loading" class="text-center"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+
+</div>
+
+
+
+
+
+</body>
+</footer>
+</html>
